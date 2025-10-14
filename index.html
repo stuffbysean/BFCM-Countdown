@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Friday Countdown Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="game-header">
+            <h1 class="game-title">Black Friday Countdown</h1>
+            <p class="game-subtitle">Are you operationally ready for BFCM 2025?</p>
+        </header>
+
+        <!-- Countdown Section -->
+        <section class="countdown-section" id="countdownSection">
+            <h2 class="section-title">Time Until Black Friday 2025</h2>
+            <div class="countdown-display">
+                <div class="countdown-item">
+                    <span class="countdown-value" id="days">00</span>
+                    <span class="countdown-label">Days</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="hours">00</span>
+                    <span class="countdown-label">Hours</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="minutes">00</span>
+                    <span class="countdown-label">Minutes</span>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <span class="countdown-value" id="seconds">00</span>
+                    <span class="countdown-label">Seconds</span>
+                </div>
+            </div>
+            <div class="countdown-cta">
+                <button class="pixel-button cta-button" id="readyButton">Ready for BFCM 2025?</button>
+            </div>
+        </section>
+
+        <!-- Assessment Section -->
+        <section class="assessment-section hidden" id="assessmentSection">
+            <h2 class="section-title">Planning Assessment</h2>
+            <div class="assessment-content">
+                <p class="assessment-intro">Let's evaluate your BFCM preparation and determine your difficulty level.</p>
+
+                <!-- Planning Start Date Slider -->
+                <div class="planning-question">
+                    <h3 class="question-title">When did you start planning?</h3>
+                    <div class="date-slider-container">
+                        <div class="date-display">
+                            <span class="selected-date" id="selectedDate">January 1, 2025</span>
+                            <span class="weeks-ago" id="weeksAgo">42 weeks ago</span>
+                        </div>
+                        <input type="range" id="planningDateSlider" class="date-slider" min="0" max="42" value="0" step="1">
+                        <div class="date-labels">
+                            <span>Jan 2025</span>
+                            <span>Today</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preparation Checklist -->
+                <div class="checklist-question">
+                    <h3 class="question-title">What have you completed?</h3>
+                    <div class="checklist-container" id="checklistContainer">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="inventory">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Inventory forecasting completed</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="calendar">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Black Friday promotional calendar created</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="email">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Email campaign sequence built</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="ads">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Paid ad campaigns launched</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="load-test">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Website load testing completed</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="shipping">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Shipping carrier contracts negotiated</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="support">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Customer service team staffed & trained</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="returns">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Return/exchange policy updated</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="discounts">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Discount codes & automations configured</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="prep-item" value="post-purchase">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-label">Post-purchase email flows ready</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Difficulty Badge -->
+                <div class="difficulty-badge-container" id="difficultyBadge">
+                    <h3 class="difficulty-title">Your Difficulty Level</h3>
+                    <div class="difficulty-badge" id="difficultyLevel">
+                        <span class="difficulty-text">MEDIUM</span>
+                    </div>
+                </div>
+
+                <div class="assessment-controls">
+                    <button class="pixel-button cta-button" id="launchGameButton">Start Game</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Canvas Section -->
+        <section class="game-section hidden" id="gameSection">
+            <h2 class="section-title">Black Friday Operations</h2>
+
+            <div class="game-container">
+                <!-- Game Area (Full Width) -->
+                <div class="game-area">
+                    <!-- Notification Container -->
+                    <div class="notification-container" id="notificationContainer"></div>
+                    <!-- Black Friday Countdown in Game -->
+                    <div class="game-countdown">
+                        <h3 class="game-countdown-title">Time Until Black Friday 2025</h3>
+                        <div class="game-countdown-display">
+                            <div class="game-countdown-item">
+                                <span class="game-countdown-value" id="gameDays">00</span>
+                                <span class="game-countdown-label">Days</span>
+                            </div>
+                            <span class="game-countdown-sep">:</span>
+                            <div class="game-countdown-item">
+                                <span class="game-countdown-value" id="gameHours">00</span>
+                                <span class="game-countdown-label">Hours</span>
+                            </div>
+                            <span class="game-countdown-sep">:</span>
+                            <div class="game-countdown-item">
+                                <span class="game-countdown-value" id="gameMinutes">00</span>
+                                <span class="game-countdown-label">Minutes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-info">
+                        <div class="game-stat">
+                            <span class="stat-label">Level:</span>
+                            <span class="stat-value" id="level">1/10</span>
+                        </div>
+                        <div class="game-stat">
+                            <span class="stat-label">Score:</span>
+                            <span class="stat-value" id="score">0</span>
+                        </div>
+                        <div class="game-stat">
+                            <span class="stat-label">Lives:</span>
+                            <span class="stat-value" id="lives">3</span>
+                        </div>
+                    </div>
+                    <div class="game-canvas-wrapper">
+                        <canvas id="gameCanvas" width="800" height="600"></canvas>
+                    </div>
+                    <div class="game-controls">
+                        <button class="pixel-button" id="startGame">Start Game</button>
+                        <button class="pixel-button" id="pauseGame">Pause</button>
+                        <button class="pixel-button" id="restartGame">Restart</button>
+                        <button class="pixel-button" id="homeButton">Home</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="game-footer">
+            <p>Made with ❤️ for Operations Teams by <a href="https://www.stuffbysean.com" target="_blank" rel="noopener noreferrer">Stuff by Sean</a></p>
+        </footer>
+    </div>
+
+    <!-- Results Modal Overlay -->
+    <div class="modal-overlay hidden" id="resultsModal">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-content results-modal">
+            <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+            <h2 class="section-title">Game Over</h2>
+            <div class="results-content">
+                <div class="final-score">
+                    <span class="results-label">Final Score:</span>
+                    <span class="results-value" id="finalScore">0</span>
+                </div>
+                <div class="results-message" id="resultsMessage">
+                    <p>Great effort! Keep improving your operational skills!</p>
+                </div>
+                <div class="results-controls">
+                    <button class="pixel-button" id="playAgain">Play Again</button>
+                    <button class="pixel-button" id="shareScore">Share Score</button>
+                    <a href="https://www.stuffbysean.com" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                        <button class="pixel-button cta-button" style="width: 100%; margin-top: 16px;">Need Ops Help? Let's Chat</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
