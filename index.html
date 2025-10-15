@@ -4,12 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Black Friday Countdown Game</title>
+
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="Black Friday Countdown Game - Are You Ready for BFCM 2025?">
+    <meta property="og:description" content="Test your operational readiness for Black Friday 2025! Play this retro-style game to see if you can handle the chaos of peak season.">
+    <meta property="og:image" content="https://countdown.stuffbysean.com/assets/Countdown%20Meta%20Image.png">
+    <meta property="og:image:alt" content="Black Friday Countdown Game">
+    <meta property="og:url" content="https://countdown.stuffbysean.com">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Black Friday Countdown Game - Are You Ready for BFCM 2025?">
+    <meta name="twitter:description" content="Test your operational readiness for Black Friday 2025! Play this retro-style game to see if you can handle the chaos of peak season.">
+    <meta name="twitter:image" content="https://countdown.stuffbysean.com/assets/Countdown%20Meta%20Image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Persistent Countdown Header -->
+    <div class="sticky-countdown-header">
+        <div class="sticky-countdown-content">
+            <span class="sticky-countdown-label">Time Until Black Friday 2025:</span>
+            <div class="sticky-countdown-display">
+                <div class="sticky-countdown-item">
+                    <span class="sticky-countdown-value" id="stickyDays">00</span>
+                    <span class="sticky-countdown-unit">d</span>
+                </div>
+                <span class="sticky-countdown-sep">:</span>
+                <div class="sticky-countdown-item">
+                    <span class="sticky-countdown-value" id="stickyHours">00</span>
+                    <span class="sticky-countdown-unit">h</span>
+                </div>
+                <span class="sticky-countdown-sep">:</span>
+                <div class="sticky-countdown-item">
+                    <span class="sticky-countdown-value" id="stickyMinutes">00</span>
+                    <span class="sticky-countdown-unit">m</span>
+                </div>
+                <span class="sticky-countdown-sep">:</span>
+                <div class="sticky-countdown-item">
+                    <span class="sticky-countdown-value" id="stickySeconds">00</span>
+                    <span class="sticky-countdown-unit">s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Header Section -->
         <header class="game-header">
@@ -75,52 +121,52 @@
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="inventory">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Inventory forecasting completed</span>
+                            <span class="checkbox-label">Inventory & Stock Forecasting</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="calendar">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Black Friday promotional calendar created</span>
+                            <span class="checkbox-label">Website & Technology Check</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="email">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Email campaign sequence built</span>
+                            <span class="checkbox-label">Marketing & Creative Assets Ready</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="ads">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Paid ad campaigns launched</span>
+                            <span class="checkbox-label">Customer Support Briefed</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="load-test">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Website load testing completed</span>
+                            <span class="checkbox-label">Shipping & Fulfillment Logistics</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="shipping">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Shipping carrier contracts negotiated</span>
+                            <span class="checkbox-label">Budget & Sales Forecast</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="support">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Customer service team staffed & trained</span>
+                            <span class="checkbox-label">Promotions & Discounts Setup and Tested</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="returns">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Return/exchange policy updated</span>
+                            <span class="checkbox-label">Team Staffing & Coverage Plan</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="discounts">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Discount codes & automations configured</span>
+                            <span class="checkbox-label">Communication & Coordination Plan</span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="prep-item" value="post-purchase">
                             <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Post-purchase email flows ready</span>
+                            <span class="checkbox-label">Real-Time Dashboard</span>
                         </label>
                     </div>
                 </div>
@@ -148,26 +194,6 @@
                 <div class="game-area">
                     <!-- Notification Container -->
                     <div class="notification-container" id="notificationContainer"></div>
-                    <!-- Black Friday Countdown in Game -->
-                    <div class="game-countdown">
-                        <h3 class="game-countdown-title">Time Until Black Friday 2025</h3>
-                        <div class="game-countdown-display">
-                            <div class="game-countdown-item">
-                                <span class="game-countdown-value" id="gameDays">00</span>
-                                <span class="game-countdown-label">Days</span>
-                            </div>
-                            <span class="game-countdown-sep">:</span>
-                            <div class="game-countdown-item">
-                                <span class="game-countdown-value" id="gameHours">00</span>
-                                <span class="game-countdown-label">Hours</span>
-                            </div>
-                            <span class="game-countdown-sep">:</span>
-                            <div class="game-countdown-item">
-                                <span class="game-countdown-value" id="gameMinutes">00</span>
-                                <span class="game-countdown-label">Minutes</span>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="game-info">
                         <div class="game-stat">

@@ -22,8 +22,6 @@ const gameState = {
         isPaused: false,
         score: 0,
         lives: 3,
-        timeRemaining: 0,
-        initialTimeRemaining: 0,
         interval: null,
         level: 1,
         maxLevel: 10,
@@ -63,13 +61,19 @@ const gameState = {
 // DOM Elements
 // ===================================
 const elements = {
-    // Countdown elements
+    // Countdown elements (main page)
     countdownSection: document.getElementById('countdownSection'),
     days: document.getElementById('days'),
     hours: document.getElementById('hours'),
     minutes: document.getElementById('minutes'),
     seconds: document.getElementById('seconds'),
     readyButton: document.getElementById('readyButton'),
+
+    // Sticky header countdown elements
+    stickyDays: document.getElementById('stickyDays'),
+    stickyHours: document.getElementById('stickyHours'),
+    stickyMinutes: document.getElementById('stickyMinutes'),
+    stickySeconds: document.getElementById('stickySeconds'),
 
     // Assessment elements
     assessmentSection: document.getElementById('assessmentSection'),
@@ -83,9 +87,6 @@ const elements = {
     // Game elements
     gameSection: document.getElementById('gameSection'),
     gameCanvas: document.getElementById('gameCanvas'),
-    gameDays: document.getElementById('gameDays'),
-    gameHours: document.getElementById('gameHours'),
-    gameMinutes: document.getElementById('gameMinutes'),
     level: document.getElementById('level'),
     score: document.getElementById('score'),
     lives: document.getElementById('lives'),
@@ -113,69 +114,69 @@ const elements = {
 // ===================================
 const slackMessages = {
     level1: [
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Morning team! Just checking in - are we all set for launch day?', urgent: false },
-        { sender: 'mike-marketing', avatar: '📢', text: 'Email campaigns are scheduled and ready to go!', urgent: false },
-        { sender: 'alex-ops', avatar: '⚙️', text: 'Server capacity looks good. Monitoring dashboards are up.', urgent: false }
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Morning team! Just checking in - are we all set for launch day?', urgent: false },
+        { sender: 'Mike (Marketing)', avatar: '📢', text: 'Email campaigns are scheduled and ready to go!', urgent: false },
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: 'Server capacity looks good. Monitoring dashboards are up.', urgent: false }
     ],
     level2: [
-        { sender: 'jen-customer-success', avatar: '💬', text: 'Customer support team is briefed and standing by!', urgent: false },
-        { sender: 'david-logistics', avatar: '📦', text: 'Warehouse is prepped. Shipping carriers confirmed.', urgent: false },
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Traffic is starting to pick up. Keep an eye on things.', urgent: false }
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: 'Customer support team is briefed and standing by!', urgent: false },
+        { sender: 'David (Logistics)', avatar: '📦', text: 'Warehouse is prepped. Shipping carriers confirmed.', urgent: false },
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Traffic is starting to pick up. Keep an eye on things.', urgent: false }
     ],
     level3: [
-        { sender: 'mike-marketing', avatar: '📢', text: 'First email blast just went out. Expecting traffic spike in 10 mins.', urgent: false },
-        { sender: 'alex-ops', avatar: '⚙️', text: 'Seeing increased load. All systems nominal so far.', urgent: false },
-        { sender: 'ceo', avatar: '👔', text: 'Great start everyone. Let\'s keep this momentum going!', urgent: false }
+        { sender: 'Mike (Marketing)', avatar: '📢', text: 'First email blast just went out. Expecting traffic spike in 10 mins.', urgent: false },
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: 'Seeing increased load. All systems nominal so far.', urgent: false },
+        { sender: 'CEO', avatar: '👔', text: 'Great start everyone. Let\'s keep this momentum going!', urgent: false }
     ],
     level4: [
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Traffic is 2x our projections! This is incredible!', urgent: false },
-        { sender: 'alex-ops', avatar: '⚙️', text: 'Scaling up additional servers. Response times still good.', urgent: false },
-        { sender: 'jen-customer-success', avatar: '💬', text: 'Support tickets coming in faster. We\'re handling it!', urgent: false },
-        { sender: 'ceo', avatar: '👔', text: 'Amazing numbers! Keep me posted on any issues.', urgent: false }
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Traffic is 2x our projections! This is incredible!', urgent: false },
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: 'Scaling up additional servers. Response times still good.', urgent: false },
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: 'Support tickets coming in faster. We\'re handling it!', urgent: false },
+        { sender: 'CEO', avatar: '👔', text: 'Amazing numbers! Keep me posted on any issues.', urgent: false }
     ],
     level5: [
-        { sender: 'alex-ops', avatar: '⚙️', text: 'Database queries slowing down. Investigating now.', urgent: true },
-        { sender: 'mike-marketing', avatar: '📢', text: 'Why did our conversion rate just drop??', urgent: true },
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Are customers able to check out? Getting some complaints on social.', urgent: true },
-        { sender: 'ceo', avatar: '👔', text: 'I need a status update ASAP. What\'s happening?', urgent: true }
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: 'Database queries slowing down. Investigating now.', urgent: true },
+        { sender: 'Mike (Marketing)', avatar: '📢', text: 'Why did our conversion rate just drop??', urgent: true },
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Are customers able to check out? Getting some complaints on social.', urgent: true },
+        { sender: 'CEO', avatar: '👔', text: 'I need a status update ASAP. What\'s happening?', urgent: true }
     ],
     level6: [
-        { sender: 'alex-ops', avatar: '⚙️', text: '🔥 Payment gateway is timing out! Working on it!', urgent: true },
-        { sender: 'jen-customer-success', avatar: '💬', text: 'Support queue is EXPLODING. Customers can\'t complete purchases!', urgent: true },
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'We\'re losing sales every second this is down!', urgent: true },
-        { sender: 'ceo', avatar: '👔', text: 'THIS IS NOT ACCEPTABLE. Fix it NOW.', urgent: true },
-        { sender: 'david-logistics', avatar: '📦', text: 'Orders stopped flowing to warehouse. What\'s going on??', urgent: true }
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: '🔥 Payment gateway is timing out! Working on it!', urgent: true },
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: 'Support queue is EXPLODING. Customers can\'t complete purchases!', urgent: true },
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'We\'re losing sales every second this is down!', urgent: true },
+        { sender: 'CEO', avatar: '👔', text: 'THIS IS NOT ACCEPTABLE. Fix it NOW.', urgent: true },
+        { sender: 'David (Logistics)', avatar: '📦', text: 'Orders stopped flowing to warehouse. What\'s going on??', urgent: true }
     ],
     level7: [
-        { sender: 'alex-ops', avatar: '⚙️', text: '🔥🔥 CDN is failing! Images not loading!', urgent: true },
-        { sender: 'mike-marketing', avatar: '📢', text: 'Our ads are driving traffic to a broken site! STOP THE BLEEDING!', urgent: true },
-        { sender: 'jen-customer-success', avatar: '💬', text: '200+ support tickets in the last 5 minutes!!!', urgent: true },
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Social media is ROASTING us. This is a disaster!', urgent: true },
-        { sender: 'ceo', avatar: '👔', text: '🚨 All hands on deck. I want every engineer in the war room NOW.', urgent: true }
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: '🔥🔥 CDN is failing! Images not loading!', urgent: true },
+        { sender: 'Mike (Marketing)', avatar: '📢', text: 'Our ads are driving traffic to a broken site! STOP THE BLEEDING!', urgent: true },
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: '200+ support tickets in the last 5 minutes!!!', urgent: true },
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Social media is ROASTING us. This is a disaster!', urgent: true },
+        { sender: 'CEO', avatar: '👔', text: '🚨 All hands on deck. I want every engineer in the war room NOW.', urgent: true }
     ],
     level8: [
-        { sender: 'alex-ops', avatar: '⚙️', text: '💀 Cart abandonment is at 80%! Everything is on fire!', urgent: true },
-        { sender: 'board-member', avatar: '💼', text: 'CEO just called me. What the hell is going on over there?!', urgent: true },
-        { sender: 'mike-marketing', avatar: '📢', text: 'I\'m pausing ALL ad spend. We can\'t drive traffic to this mess!', urgent: true },
-        { sender: 'jen-customer-success', avatar: '💬', text: 'I\'m getting death threats from customers! THIS IS INSANE!', urgent: true },
-        { sender: 'ceo', avatar: '👔', text: '🔥 We\'re losing MILLIONS per hour! Someone better have answers!', urgent: true }
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: '💀 Cart abandonment is at 80%! Everything is on fire!', urgent: true },
+        { sender: 'Board Member', avatar: '💼', text: 'CEO just called me. What the hell is going on over there?!', urgent: true },
+        { sender: 'Mike (Marketing)', avatar: '📢', text: 'I\'m pausing ALL ad spend. We can\'t drive traffic to this mess!', urgent: true },
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: 'I\'m getting death threats from customers! THIS IS INSANE!', urgent: true },
+        { sender: 'CEO', avatar: '👔', text: '🔥 We\'re losing MILLIONS per hour! Someone better have answers!', urgent: true }
     ],
     level9: [
-        { sender: 'alex-ops', avatar: '⚙️', text: '🆘 Multiple cascading failures! Trying emergency rollback!', urgent: true },
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Press is calling. Do we have a statement??', urgent: true },
-        { sender: 'cfo', avatar: '💰', text: 'Revenue down 90% in last hour. This will affect quarterly earnings.', urgent: true },
-        { sender: 'jen-customer-success', avatar: '💬', text: 'Customer retention team says we\'ll lose 30% of customers over this!', urgent: true },
-        { sender: 'ceo', avatar: '👔', text: '💀 Board wants my head. Fix this or we\'re ALL getting fired!', urgent: true },
-        { sender: 'board-member', avatar: '💼', text: 'Emergency board meeting in 1 hour. You better have this fixed.', urgent: true }
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: '🆘 Multiple cascading failures! Trying emergency rollback!', urgent: true },
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Press is calling. Do we have a statement??', urgent: true },
+        { sender: 'CFO', avatar: '💰', text: 'Revenue down 90% in last hour. This will affect quarterly earnings.', urgent: true },
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: 'Customer retention team says we\'ll lose 30% of customers over this!', urgent: true },
+        { sender: 'CEO', avatar: '👔', text: '💀 Board wants my head. Fix this or we\'re ALL getting fired!', urgent: true },
+        { sender: 'Board Member', avatar: '💼', text: 'Emergency board meeting in 1 hour. You better have this fixed.', urgent: true }
     ],
     level10: [
-        { sender: 'alex-ops', avatar: '⚙️', text: '🔥🔥🔥 TOTAL SYSTEM COLLAPSE! MAYDAY MAYDAY!', urgent: true },
-        { sender: 'ceo', avatar: '👔', text: '💀💀💀 THIS IS A COMPLETE DISASTER! EVERYTHING IS BROKEN!', urgent: true },
-        { sender: 'mike-marketing', avatar: '📢', text: 'Competitors are tweeting about our meltdown! We\'re trending for all the wrong reasons!', urgent: true },
-        { sender: 'sarah-cmo', avatar: '👩‍💼', text: 'Reuters, Bloomberg, TechCrunch all covering our failure! WHAT DO I TELL THEM?!', urgent: true },
-        { sender: 'cfo', avatar: '💰', text: '💸 Stock dropped 40% in after-hours trading!', urgent: true },
-        { sender: 'jen-customer-success', avatar: '💬', text: '1000+ support tickets! Team is crying! Someone bring coffee and tissues!', urgent: true },
-        { sender: 'board-member', avatar: '💼', text: 'Start preparing resignation letters. This is unacceptable.', urgent: true }
+        { sender: 'Alex (Operations)', avatar: '⚙️', text: '🔥🔥🔥 TOTAL SYSTEM COLLAPSE! MAYDAY MAYDAY!', urgent: true },
+        { sender: 'CEO', avatar: '👔', text: '💀💀💀 THIS IS A COMPLETE DISASTER! EVERYTHING IS BROKEN!', urgent: true },
+        { sender: 'Mike (Marketing)', avatar: '📢', text: 'Competitors are tweeting about our meltdown! We\'re trending for all the wrong reasons!', urgent: true },
+        { sender: 'Sarah (CMO)', avatar: '👩‍💼', text: 'Reuters, Bloomberg, TechCrunch all covering our failure! WHAT DO I TELL THEM?!', urgent: true },
+        { sender: 'CFO', avatar: '💰', text: '💸 Stock dropped 40% in after-hours trading!', urgent: true },
+        { sender: 'Jen (Customer Success)', avatar: '💬', text: '1000+ support tickets! Team is crying! Someone bring coffee and tissues!', urgent: true },
+        { sender: 'Board Member', avatar: '💼', text: 'Start preparing resignation letters. This is unacceptable.', urgent: true }
     ]
 };
 
@@ -317,7 +318,7 @@ function renderMessages(ctx) {
 
     // Close button
     const buttonWidth = 140;
-    const buttonHeight = 36;
+    const buttonHeight = 40;
     const buttonX = x + (messageWidth - buttonWidth) / 2;
     const buttonY = y + messageHeight - buttonHeight - 20;
 
@@ -331,7 +332,8 @@ function renderMessages(ctx) {
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('DISMISS', buttonX + buttonWidth / 2, buttonY + 24);
+    ctx.textBaseline = 'middle';
+    ctx.fillText('DISMISS', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
     // Store button coordinates for click detection
     gameState.game.dismissButton = {
@@ -420,6 +422,10 @@ function updateCountdown() {
         elements.hours.textContent = '00';
         elements.minutes.textContent = '00';
         elements.seconds.textContent = '00';
+        elements.stickyDays.textContent = '00';
+        elements.stickyHours.textContent = '00';
+        elements.stickyMinutes.textContent = '00';
+        elements.stickySeconds.textContent = '00';
         return;
     }
 
@@ -428,10 +434,17 @@ function updateCountdown() {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+    // Update main countdown section
     elements.days.textContent = String(days).padStart(2, '0');
     elements.hours.textContent = String(hours).padStart(2, '0');
     elements.minutes.textContent = String(minutes).padStart(2, '0');
     elements.seconds.textContent = String(seconds).padStart(2, '0');
+
+    // Update sticky header countdown
+    elements.stickyDays.textContent = String(days).padStart(2, '0');
+    elements.stickyHours.textContent = String(hours).padStart(2, '0');
+    elements.stickyMinutes.textContent = String(minutes).padStart(2, '0');
+    elements.stickySeconds.textContent = String(seconds).padStart(2, '0');
 }
 
 // ===================================
@@ -543,17 +556,9 @@ function launchGame() {
 function initializeGame() {
     const ctx = elements.gameCanvas.getContext('2d');
 
-    // Calculate time remaining until Black Friday
-    const now = new Date().getTime();
-    const blackFriday = new Date(2025, 10, 28, 0, 0, 0, 0).getTime();
-    const timeRemainingMS = blackFriday - now;
-    const timeRemainingSeconds = Math.max(0, Math.floor(timeRemainingMS / 1000));
-
     gameState.game.score = 0;
     gameState.game.lives = 3;
     gameState.game.level = 1;
-    gameState.game.timeRemaining = timeRemainingSeconds;
-    gameState.game.initialTimeRemaining = timeRemainingSeconds;
     gameState.game.isRunning = false;
     gameState.game.isPaused = false;
     gameState.game.totalCatches = 0;
@@ -591,7 +596,6 @@ function initializeGame() {
     gameState.game.messages = [];
 
     updateGameUI();
-    updateGameCountdown();
 
     // Draw initial game state
     ctx.fillStyle = '#87CEEB';
@@ -663,19 +667,6 @@ function restartGame() {
     elements.pauseGame.textContent = 'Pause';
 }
 
-// updateGameTimer() removed - countdown now handled in gameLoop()
-
-function updateGameCountdown() {
-    const totalSeconds = gameState.game.timeRemaining;
-
-    const days = Math.floor(totalSeconds / (60 * 60 * 24));
-    const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-
-    elements.gameDays.textContent = String(days).padStart(2, '0');
-    elements.gameHours.textContent = String(hours).padStart(2, '0');
-    elements.gameMinutes.textContent = String(minutes).padStart(2, '0');
-}
 
 function checkLevelProgression() {
     // Check if player has caught enough for current level
@@ -710,43 +701,6 @@ function updateGameUI() {
     elements.lives.textContent = gameState.game.lives;
 }
 
-function calculateCountdownSpeed() {
-    // Calculate how fast countdown should decrease per frame
-    // Goal: Countdown reaches 0 exactly when player finishes the game (any level)
-
-    // Calculate remaining catches needed to finish
-    const currentLevel = gameState.game.level;
-    const levelsRemaining = gameState.game.maxLevel - currentLevel + 1;
-    const catchesRemainingThisLevel = gameState.game.catchesNeededPerLevel - gameState.game.catchesThisLevel;
-    const totalCatchesRemaining = catchesRemainingThisLevel + ((levelsRemaining - 1) * gameState.game.catchesNeededPerLevel);
-
-    // If no catches remaining (game won), return 0
-    if (totalCatchesRemaining <= 0) {
-        return 0;
-    }
-
-    // Calculate actual average frames per catch more accurately
-    // Time for object to fall from top to bottom
-    const fallTime = gameState.game.canvasHeight / gameState.game.baseSpeed;
-
-    // Average spawn interval (accounts for current level)
-    const averageSpawnInterval = gameState.game.spawnInterval;
-
-    // Total frames per catch = spawn wait + fall time
-    // Multiply by 1.3 to account for some misses and imperfect play
-    const averageFramesPerCatch = (fallTime + averageSpawnInterval) * 1.3;
-
-    // Estimate total frames to finish
-    const estimatedFramesToFinish = totalCatchesRemaining * averageFramesPerCatch;
-
-    // Calculate speed so countdown reaches 0 when done
-    const speedPerFrame = gameState.game.timeRemaining / estimatedFramesToFinish;
-
-    // Set minimum speed to prevent countdown from stalling (0.5 seconds per frame)
-    // Maximum speed capped at 3.0 to prevent racing too fast
-    // At 60 FPS, max of 3.0 = 180 seconds/minute of real time = 3 minutes per minute
-    return Math.max(0.5, Math.min(speedPerFrame, 3.0));
-}
 
 function spawnObject() {
     const x = Math.random() * (gameState.game.canvasWidth - 60) + 30; // 30px from edges
@@ -844,30 +798,6 @@ function gameLoop() {
 
     const ctx = elements.gameCanvas.getContext('2d');
     const player = gameState.game.player;
-
-    // Accelerated countdown - decreases faster than real-time
-    const countdownSpeed = calculateCountdownSpeed();
-    gameState.game.timeRemaining -= countdownSpeed;
-
-    // Ensure countdown doesn't go negative
-    if (gameState.game.timeRemaining < 0) {
-        gameState.game.timeRemaining = 0;
-    }
-
-    // Update countdown display
-    updateGameCountdown();
-
-    // Check if countdown reached zero
-    if (gameState.game.timeRemaining <= 0) {
-        if (gameState.game.level >= gameState.game.maxLevel) {
-            // Victory - reached level 10 at time zero!
-            endGame(true);
-        } else {
-            // Loss - ran out of time before level 10
-            endGame(false);
-        }
-        return;
-    }
 
     // Clear canvas with solid color background
     ctx.fillStyle = '#87CEEB';
