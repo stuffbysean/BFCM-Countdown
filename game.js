@@ -607,6 +607,9 @@ function launchGame() {
     const checkedCount = document.querySelectorAll('input[name="prep-item"]:checked').length;
     gameState.assessment.checkedCount = checkedCount;
 
+    // Re-initialize game with the correct difficulty settings from assessment
+    initializeGame();
+
     elements.assessmentSection.classList.add('hidden');
     elements.gameSection.classList.remove('hidden');
     elements.gameSection.scrollIntoView({ behavior: 'smooth' });
@@ -665,9 +668,9 @@ function initializeGame() {
         gameState.game.spawnInterval = 90; // ~1.5 seconds
         gameState.game.objectsPerSpawn = 2; // 2 objects at once
     } else if (difficulty === 'EXTREME') {
-        gameState.game.baseSpeed = 2.5;
-        gameState.game.spawnInterval = 80; // ~1.3 seconds
-        gameState.game.objectsPerSpawn = 3; // 3 objects at once!
+        gameState.game.baseSpeed = 2;
+        gameState.game.spawnInterval = 85; // ~1.4 seconds
+        gameState.game.objectsPerSpawn = 2; // Start with 2 objects, ramps up faster
     }
 
     // Clear messages on restart
