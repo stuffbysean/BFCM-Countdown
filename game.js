@@ -668,9 +668,9 @@ function initializeGame() {
         gameState.game.spawnInterval = 90; // ~1.5 seconds
         gameState.game.objectsPerSpawn = 2; // 2 objects at once
     } else if (difficulty === 'EXTREME') {
-        gameState.game.baseSpeed = 2;
-        gameState.game.spawnInterval = 85; // ~1.4 seconds
-        gameState.game.objectsPerSpawn = 2; // Start with 2 objects, ramps up faster
+        gameState.game.baseSpeed = 1.8;
+        gameState.game.spawnInterval = 95; // ~1.6 seconds
+        gameState.game.objectsPerSpawn = 1; // Start with 1 object, but ramps up faster through progression
     }
 
     // Clear messages on restart

@@ -1208,6 +1208,23 @@ body {
         letter-spacing: 1px;
     }
 
+    /* Reduce title glow effect on mobile to match desktop */
+    @keyframes titleGlow {
+        from {
+            text-shadow:
+                4px 4px 0px var(--color-black),
+                6px 6px 0px rgba(0, 0, 0, 0.5),
+                -2px -2px 0px rgba(255, 255, 255, 0.3);
+        }
+        to {
+            text-shadow:
+                4px 4px 0px var(--color-black),
+                6px 6px 0px rgba(0, 0, 0, 0.5),
+                -2px -2px 0px rgba(255, 255, 255, 0.3),
+                0 0 8px rgba(255, 255, 255, 0.3);
+        }
+    }
+
     .game-subtitle {
         font-size: 0.5rem;
         letter-spacing: 1px;
