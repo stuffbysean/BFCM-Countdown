@@ -20,6 +20,7 @@ const gameState = {
     game: {
         isRunning: false,
         isPaused: false,
+        pausedByMessage: false, // Track if paused due to message (mobile only)
         score: 0,
         lives: 3,
         interval: null,
@@ -45,7 +46,8 @@ const gameState = {
         messages: [],
         canvasWidth: 800,
         canvasHeight: 600,
-        dismissButton: null
+        dismissButton: null,
+        touchFeedback: [] // Array to store touch feedback circles
     },
     icons: {
         loaded: false,
@@ -199,6 +201,13 @@ function showNotification(msg) {
     gameState.game.messages.push({
         ...msg
     });
+
+    // Auto-pause on mobile when message appears
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && gameState.game.isRunning && !gameState.game.isPaused) {
+        gameState.game.isPaused = true;
+        gameState.game.pausedByMessage = true;
+    }
 }
 
 function sendNotification(level) {
@@ -253,13 +262,19 @@ function renderMessages(ctx) {
         return lines.length; // Return number of lines for height calculation
     }
 
-    // Calculate message dimensions - larger for better legibility
-    const messageWidth = 500;
-    const messagePadding = 30;
-    const messageHeaderHeight = 50;
+    // Detect mobile screen size for responsive message sizing
+    const isMobile = gameState.game.canvasWidth <= 480;
+    const isTablet = gameState.game.canvasWidth > 480 && gameState.game.canvasWidth <= 768;
 
-    // Measure text to determine height
-    ctx.font = '18px Arial';
+    // Calculate message dimensions - responsive sizing
+    const messageWidth = isMobile ? 320 : (isTablet ? 400 : 500);
+    const messagePadding = isMobile ? 16 : (isTablet ? 20 : 30);
+    const messageHeaderHeight = isMobile ? 35 : (isTablet ? 40 : 50);
+
+    // Measure text to determine height - responsive font sizes
+    const baseFontSize = isMobile ? 14 : (isTablet ? 16 : 18);
+    const lineHeight = isMobile ? 20 : (isTablet ? 22 : 26);
+    ctx.font = `${baseFontSize}px Arial`;
     const textMaxWidth = messageWidth - (messagePadding * 2);
 
     // Estimate lines needed
@@ -277,8 +292,9 @@ function renderMessages(ctx) {
         }
     }
 
-    const textHeight = lineCount * 26;
-    const messageHeight = messageHeaderHeight + textHeight + 80; // Extra space for padding and button
+    const textHeight = lineCount * lineHeight;
+    const buttonSpace = isMobile ? 50 : (isTablet ? 60 : 80);
+    const messageHeight = messageHeaderHeight + textHeight + buttonSpace;
 
     // Center position
     const x = (gameState.game.canvasWidth - messageWidth) / 2;
@@ -303,41 +319,48 @@ function renderMessages(ctx) {
     ctx.fillStyle = msg.urgent ? '#cc0000' : '#1e1e1e';
     ctx.fillRect(x, y, messageWidth, messageHeaderHeight);
 
-    // Avatar emoji
-    ctx.font = '28px Arial';
+    // Avatar emoji - responsive sizing
+    const avatarSize = isMobile ? 20 : (isTablet ? 24 : 28);
+    const avatarY = isMobile ? 24 : (isTablet ? 28 : 36);
+    ctx.font = `${avatarSize}px Arial`;
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'left';
-    ctx.fillText(msg.avatar, x + messagePadding, y + 36);
+    ctx.fillText(msg.avatar, x + messagePadding, y + avatarY);
 
-    // Sender name
+    // Sender name - responsive sizing
+    const senderFontSize = isMobile ? 12 : (isTablet ? 14 : 16);
+    const senderY = isMobile ? 22 : (isTablet ? 26 : 32);
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText(msg.sender, x + messagePadding + 45, y + 32);
+    ctx.font = `bold ${senderFontSize}px Arial`;
+    ctx.fillText(msg.sender, x + messagePadding + (isMobile ? 30 : 45), y + senderY);
 
-    // Message text (wrapped) - higher contrast
-    ctx.font = '18px Arial';
+    // Message text (wrapped) - higher contrast with responsive sizing
+    ctx.font = `${baseFontSize}px Arial`;
     ctx.fillStyle = msg.urgent ? '#ffffff' : '#000000';
     ctx.textAlign = 'left';
-    wrapText(ctx, msg.text, x + messagePadding, y + messageHeaderHeight + 30, textMaxWidth, 26);
+    const textY = isMobile ? 20 : (isTablet ? 25 : 30);
+    wrapText(ctx, msg.text, x + messagePadding, y + messageHeaderHeight + textY, textMaxWidth, lineHeight);
 
-    // Close button
-    const buttonWidth = 140;
-    const buttonHeight = 40;
+    // Close button - responsive sizing
+    const buttonWidth = isMobile ? 100 : (isTablet ? 120 : 140);
+    const buttonHeight = isMobile ? 32 : (isTablet ? 36 : 40);
     const buttonX = x + (messageWidth - buttonWidth) / 2;
-    const buttonY = y + messageHeight - buttonHeight - 20;
+    const buttonY = y + messageHeight - buttonHeight - (isMobile ? 12 : 20);
 
     ctx.fillStyle = '#27ae60';
     ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = isMobile ? 3 : 4;
     ctx.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 14px Arial';
+    const buttonFontSize = isMobile ? 11 : (isTablet ? 12 : 14);
+    ctx.font = `bold ${buttonFontSize}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('REPLY', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+    const buttonText = isMobile ? 'TAP' : 'REPLY';
+    ctx.fillText(buttonText, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
     // Store button coordinates for click detection
     gameState.game.dismissButton = {
@@ -607,9 +630,25 @@ function initializeGame() {
     gameState.game.fallingObjects = [];
     gameState.game.spawnTimer = 0;
 
-    // Reset player position
-    gameState.game.player.x = 360;
-    gameState.game.player.y = 517;
+    // Detect mobile for responsive sizing
+    const isMobile = window.innerWidth <= 480;
+    const isTablet = window.innerWidth > 480 && window.innerWidth <= 768;
+
+    // Adjust player size for mobile (larger for better touch control)
+    if (isMobile) {
+        gameState.game.player.width = 100;
+        gameState.game.player.height = 104;
+    } else if (isTablet) {
+        gameState.game.player.width = 90;
+        gameState.game.player.height = 94;
+    } else {
+        gameState.game.player.width = 80;
+        gameState.game.player.height = 83;
+    }
+
+    // Reset player position (centered at bottom)
+    gameState.game.player.x = (gameState.game.canvasWidth - gameState.game.player.width) / 2;
+    gameState.game.player.y = gameState.game.canvasHeight - gameState.game.player.height;
 
     // Set difficulty-based speed and object count
     const difficulty = gameState.assessment.difficulty;
@@ -752,10 +791,17 @@ function spawnObject() {
         icon = gameState.icons.dropIcons[randomIndex];
     }
 
+    // Detect mobile for responsive sizing
+    const isMobile = window.innerWidth <= 480;
+    const isTablet = window.innerWidth > 480 && window.innerWidth <= 768;
+
+    // Larger objects on mobile for better visibility and touch accuracy
+    const radius = isMobile ? 30 : (isTablet ? 27 : 24);
+
     gameState.game.fallingObjects.push({
         x: x,
         y: 0,
-        radius: 24, // Bigger uniform icon size (48px diameter)
+        radius: radius,
         speed: speed,
         color: '#ffd700', // Fallback color if icon doesn't load
         icon: icon
@@ -828,15 +874,52 @@ function movePlayer(direction) {
 }
 
 function gameLoop() {
-    if (!gameState.game.isRunning || gameState.game.isPaused) {
-        if (gameState.game.isRunning) {
-            requestAnimationFrame(gameLoop);
-        }
+    if (!gameState.game.isRunning) {
         return;
     }
 
     const ctx = elements.gameCanvas.getContext('2d');
     const player = gameState.game.player;
+
+    // If paused, still render the current frame but don't update game state
+    if (gameState.game.isPaused) {
+        // Render current game state without updates
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, gameState.game.canvasWidth, gameState.game.canvasHeight);
+
+        // Draw falling objects (frozen in place)
+        gameState.game.fallingObjects.forEach(obj => {
+            if (obj.icon && gameState.icons.loaded && obj.icon.complete && obj.icon.naturalWidth > 0) {
+                const size = obj.radius * 2;
+                ctx.drawImage(obj.icon, obj.x - obj.radius, obj.y - obj.radius, size, size);
+            } else {
+                ctx.fillStyle = obj.color;
+                ctx.beginPath();
+                ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ff8c00';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+        });
+
+        // Draw player character
+        if (gameState.playerCharacter.loaded && gameState.playerCharacter.image.complete) {
+            ctx.drawImage(gameState.playerCharacter.image, player.x, player.y, player.width, player.height);
+        } else {
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.strokeStyle = '#654321';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(player.x, player.y, player.width, player.height);
+        }
+
+        // Render messages on top (this is why we paused!)
+        renderMessages(ctx);
+
+        requestAnimationFrame(gameLoop);
+        return;
+    }
 
     // Clear canvas with solid color background
     ctx.fillStyle = '#87CEEB';
@@ -885,6 +968,31 @@ function gameLoop() {
         ctx.strokeStyle = '#654321';
         ctx.lineWidth = 2;
         ctx.strokeRect(player.x, player.y, player.width, player.height);
+    }
+
+    // Draw touch feedback circles
+    for (let i = gameState.game.touchFeedback.length - 1; i >= 0; i--) {
+        const feedback = gameState.game.touchFeedback[i];
+
+        // Animate the feedback
+        feedback.radius += 3;
+        feedback.alpha -= 0.05;
+
+        // Remove if fully faded
+        if (feedback.alpha <= 0) {
+            gameState.game.touchFeedback.splice(i, 1);
+            continue;
+        }
+
+        // Draw the ripple effect
+        ctx.save();
+        ctx.globalAlpha = feedback.alpha;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(feedback.x, feedback.y, feedback.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
     }
 
     // Render messages on top of everything
@@ -1307,63 +1415,173 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Helper function to scale coordinates from displayed canvas to internal canvas
+function scaleCanvasCoordinates(clientX, clientY) {
+    const rect = elements.gameCanvas.getBoundingClientRect();
+
+    // Calculate the scale ratio between internal canvas size and displayed size
+    const scaleX = gameState.game.canvasWidth / rect.width;
+    const scaleY = gameState.game.canvasHeight / rect.height;
+
+    // Get position relative to canvas
+    const displayX = clientX - rect.left;
+    const displayY = clientY - rect.top;
+
+    // Scale to internal canvas coordinates
+    const canvasX = displayX * scaleX;
+    const canvasY = displayY * scaleY;
+
+    return { x: canvasX, y: canvasY };
+}
+
 // Mouse/touch controls for player movement
 elements.gameCanvas.addEventListener('mousemove', (e) => {
     if (!gameState.game.isRunning || gameState.game.isPaused) return;
 
-    const rect = elements.gameCanvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
+    const coords = scaleCanvasCoordinates(e.clientX, e.clientY);
 
     // Center the player on the mouse cursor
     gameState.game.player.x = Math.max(0, Math.min(
         gameState.game.canvasWidth - gameState.game.player.width,
-        mouseX - gameState.game.player.width / 2
+        coords.x - gameState.game.player.width / 2
     ));
 });
 
-// Touch controls for mobile
+// Touch controls for mobile - tap to move player
+let touchStartX = null;
+let touchStartTime = null;
+let isTouchMoving = false;
+
+elements.gameCanvas.addEventListener('touchstart', (e) => {
+    if (!gameState.game.isRunning || gameState.game.isPaused) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const coords = scaleCanvasCoordinates(touch.clientX, touch.clientY);
+    touchStartX = coords.x;
+    touchStartTime = Date.now();
+    isTouchMoving = false;
+
+    // Add visual touch feedback (using canvas coordinates)
+    gameState.game.touchFeedback.push({
+        x: coords.x,
+        y: coords.y,
+        alpha: 1.0,
+        radius: 0
+    });
+
+    // If there's a message displayed, don't start touch tracking for player movement
+    if (gameState.game.messages.length > 0) {
+        touchStartX = null;
+    }
+});
+
 elements.gameCanvas.addEventListener('touchmove', (e) => {
     if (!gameState.game.isRunning || gameState.game.isPaused) return;
     e.preventDefault();
 
-    const rect = elements.gameCanvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const touchX = touch.clientX - rect.left;
+    const coords = scaleCanvasCoordinates(touch.clientX, touch.clientY);
 
-    // Center the player on the touch position
-    gameState.game.player.x = Math.max(0, Math.min(
-        gameState.game.canvasWidth - gameState.game.player.width,
-        touchX - gameState.game.player.width / 2
-    ));
+    // Mark as moving if touch has moved significantly (scaled threshold)
+    if (touchStartX !== null && Math.abs(coords.x - touchStartX) > 5) {
+        isTouchMoving = true;
+
+        // Drag to position (smooth follow)
+        gameState.game.player.x = Math.max(0, Math.min(
+            gameState.game.canvasWidth - gameState.game.player.width,
+            coords.x - gameState.game.player.width / 2
+        ));
+    }
+});
+
+elements.gameCanvas.addEventListener('touchend', (e) => {
+    if (!gameState.game.isRunning || gameState.game.isPaused) return;
+    e.preventDefault();
+
+    const touch = e.changedTouches[0];
+    const touchDuration = Date.now() - touchStartTime;
+
+    // Check if this is a tap on a message or button
+    const wasHandled = handleCanvasInteraction(touch.clientX, touch.clientY);
+
+    // If not handled and it was a quick tap (not a drag), treat as tap-to-move
+    if (!wasHandled && !isTouchMoving && touchDuration < 200 && touchStartX !== null) {
+        const tapX = touchStartX;
+
+        // Move player toward tap position
+        const targetX = Math.max(0, Math.min(
+            gameState.game.canvasWidth - gameState.game.player.width,
+            tapX - gameState.game.player.width / 2
+        ));
+
+        gameState.game.player.x = targetX;
+    }
+
+    touchStartX = null;
+    touchStartTime = null;
+    isTouchMoving = false;
 });
 
 // Click handler for START GAME button and dismissing messages
-elements.gameCanvas.addEventListener('click', (e) => {
-    const rect = elements.gameCanvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
+function handleCanvasInteraction(clientX, clientY) {
+    const coords = scaleCanvasCoordinates(clientX, clientY);
 
     // Check for START GAME button click (when game is not running)
     if (!gameState.game.isRunning && gameState.game.startButtonBounds) {
         const btn = gameState.game.startButtonBounds;
-        if (clickX >= btn.x && clickX <= btn.x + btn.width &&
-            clickY >= btn.y && clickY <= btn.y + btn.height) {
+        if (coords.x >= btn.x && coords.x <= btn.x + btn.width &&
+            coords.y >= btn.y && coords.y <= btn.y + btn.height) {
             startGame();
-            return;
+            return true;
         }
     }
 
-    // Check for message dismiss button click (when game is running)
-    if (gameState.game.isRunning && gameState.game.messages.length > 0 && gameState.game.dismissButton) {
-        const btn = gameState.game.dismissButton;
-        if (clickX >= btn.x && clickX <= btn.x + btn.width &&
-            clickY >= btn.y && clickY <= btn.y + btn.height) {
-            // Remove the current message (first in queue)
-            gameState.game.messages.shift();
-            gameState.game.dismissButton = null;
+    // Check if message is displayed and tap anywhere on message overlay to dismiss
+    if (gameState.game.isRunning && gameState.game.messages.length > 0) {
+        // Message takes up most of the screen, so any tap dismisses it
+        gameState.game.messages.shift();
+        gameState.game.dismissButton = null;
+
+        // Auto-resume on mobile when message is dismissed (if paused by message)
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile && gameState.game.pausedByMessage) {
+            gameState.game.isPaused = false;
+            gameState.game.pausedByMessage = false;
         }
+
+        return true;
     }
+
+    return false;
+}
+
+elements.gameCanvas.addEventListener('click', (e) => {
+    handleCanvasInteraction(e.clientX, e.clientY);
 });
+
+// ===================================
+// Prevent pull-to-refresh on mobile during gameplay
+// ===================================
+let lastTouchY = 0;
+
+document.body.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+        lastTouchY = e.touches[0].clientY;
+    }
+}, { passive: false });
+
+document.body.addEventListener('touchmove', (e) => {
+    const touchY = e.touches[0].clientY;
+    const touchYDelta = touchY - lastTouchY;
+    lastTouchY = touchY;
+
+    // If user is pulling down at the top of the page, prevent default
+    // This stops pull-to-refresh on iOS Safari
+    if (window.scrollY === 0 && touchYDelta > 0) {
+        e.preventDefault();
+    }
+}, { passive: false });
 
 // ===================================
 // Initialize on Page Load

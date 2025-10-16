@@ -66,6 +66,8 @@ body {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    /* Prevent overscroll bounce on mobile */
+    overscroll-behavior-y: contain;
 }
 
 .container {
@@ -315,6 +317,13 @@ body {
     animation: ctaPulse 2s ease-in-out infinite;
     position: relative;
     overflow: hidden;
+    /* Ensure minimum touch target size on mobile */
+    min-height: 44px;
+    min-width: 44px;
+    /* Prevent text selection on double-tap */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cta-button::before {
@@ -462,6 +471,12 @@ body {
     gap: var(--spacing-sm);
 }
 
+@media (max-width: 768px) {
+    .checklist-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 .checkbox-item {
     display: flex;
     align-items: center;
@@ -471,6 +486,7 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
+    overflow: hidden;
 }
 
 .checkbox-item:hover {
@@ -514,6 +530,9 @@ body {
     font-size: 0.7rem;
     color: var(--color-black);
     line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 /* Difficulty Badge Styles */
@@ -607,6 +626,15 @@ body {
     max-height: 400px;
     pointer-events: none;
     z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .notification-container {
+        top: 10px;
+        right: 10px;
+        width: 200px;
+        max-height: 300px;
+    }
 }
 
 .notification {
@@ -758,6 +786,56 @@ body {
     padding-top: 70px;
 }
 
+@media (max-width: 768px) {
+    body {
+        padding-top: 60px;
+    }
+
+    .sticky-countdown-header {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .sticky-countdown-label {
+        font-size: 0.55rem;
+    }
+
+    .sticky-countdown-value {
+        font-size: 1rem;
+    }
+
+    .sticky-countdown-unit {
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-top: 50px;
+    }
+
+    .sticky-countdown-content {
+        gap: var(--spacing-xs);
+    }
+
+    .sticky-countdown-label {
+        font-size: 0.5rem;
+        display: none; /* Hide label on very small screens */
+    }
+
+    .sticky-countdown-value {
+        font-size: 0.9rem;
+    }
+
+    .sticky-countdown-unit {
+        font-size: 0.45rem;
+    }
+
+    .sticky-countdown-sep {
+        font-size: 0.8rem;
+        margin: 0 1px;
+    }
+}
+
 .game-info {
     display: flex;
     justify-content: space-around;
@@ -800,6 +878,14 @@ body {
     max-width: 100%;
     height: auto;
     cursor: url('/assets/hand-cursor-small.png') 10 2, pointer !important;
+    touch-action: none; /* Prevent default touch behaviors */
+}
+
+/* Remove custom cursor on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    #gameCanvas {
+        cursor: default !important;
+    }
 }
 
 .game-controls {
@@ -994,6 +1080,13 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     position: relative;
+    /* Ensure minimum touch target size on mobile */
+    min-height: 44px;
+    min-width: 44px;
+    /* Prevent text selection on double-tap */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .pixel-button:hover {
@@ -1132,21 +1225,33 @@ body {
         margin-bottom: var(--spacing-sm);
     }
 
+    /* Change countdown to 2x2 grid on mobile */
+    .countdown-display {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: var(--spacing-sm);
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .countdown-separator {
         display: none;
     }
 
     .countdown-item {
-        min-width: 70px;
-        padding: var(--spacing-xs);
+        min-width: unset;
+        width: 100%;
+        padding: var(--spacing-sm);
     }
 
     .countdown-value {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
 
     .countdown-label {
-        font-size: 0.45rem;
+        font-size: 0.5rem;
     }
 
     .cta-button {
@@ -1166,6 +1271,46 @@ body {
 
     .assessment-intro {
         font-size: 0.7rem;
+    }
+
+    .checkbox-item {
+        padding: var(--spacing-xs);
+    }
+
+    .checkbox-label {
+        font-size: 0.65rem;
+    }
+
+    /* Game canvas mobile adjustments - take up more screen space */
+    .game-canvas-wrapper {
+        padding: 4px;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    #gameCanvas {
+        width: 100%;
+        height: auto;
+    }
+
+    .game-info {
+        padding: var(--spacing-sm);
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .game-section {
+        padding: var(--spacing-xs);
+    }
+
+    .game-controls {
+        gap: var(--spacing-xs);
     }
 
     /* Modal mobile adjustments */
