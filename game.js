@@ -32,9 +32,9 @@ const gameState = {
         catchesThisLevel: 0,
         player: {
             x: 360,
-            y: 570,
+            y: 517,
             width: 80,
-            height: 20,
+            height: 83,
             speed: 8
         },
         fallingObjects: [],
@@ -52,6 +52,10 @@ const gameState = {
         dropIcons: []
     },
     background: {
+        loaded: false,
+        image: null
+    },
+    playerCharacter: {
         loaded: false,
         image: null
     }
@@ -333,7 +337,7 @@ function renderMessages(ctx) {
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('DISMISS', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+    ctx.fillText('REPLY', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
     // Store button coordinates for click detection
     gameState.game.dismissButton = {
@@ -399,6 +403,20 @@ function preloadBackground() {
     console.log('Started loading background image from: assets/background/background.png');
 }
 
+function preloadPlayerCharacter() {
+    const playerImg = new Image();
+    playerImg.onload = () => {
+        gameState.playerCharacter.loaded = true;
+        gameState.playerCharacter.image = playerImg;
+        console.log('Player character loaded successfully!');
+    };
+    playerImg.onerror = (error) => {
+        console.error('Failed to load player character:', error);
+        gameState.playerCharacter.loaded = false;
+    };
+    playerImg.src = 'assets/player-character.png';
+}
+
 // ===================================
 // Countdown Timer Functions
 // ===================================
@@ -451,6 +469,16 @@ function updateCountdown() {
 // Planning Assessment Functions
 // ===================================
 function initializePlanningAssessment() {
+    // Calculate actual weeks from Jan 1, 2025 to today
+    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    const today = new Date();
+    const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    const totalWeeks = Math.floor(daysSinceStart / 7);
+
+    // Set slider max value to actual weeks since start
+    elements.planningDateSlider.max = totalWeeks;
+    elements.planningDateSlider.value = totalWeeks; // Default to today
+
     // Initialize date slider
     updateDateDisplay();
 
@@ -469,11 +497,16 @@ function initializePlanningAssessment() {
 
 function updateDateDisplay() {
     const weeksFromStart = parseInt(elements.planningDateSlider.value);
-    const totalWeeks = 42; // From Jan 1 to Oct 14
+
+    // Calculate actual weeks from Jan 1, 2025 to today
+    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    const today = new Date();
+    const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    const totalWeeks = Math.floor(daysSinceStart / 7);
+
     const weeksAgo = totalWeeks - weeksFromStart;
 
-    // Calculate the date based on weeks from January 1, 2025
-    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    // Calculate the selected date based on weeks from January 1, 2025
     const selectedDate = new Date(startDate);
     selectedDate.setDate(selectedDate.getDate() + (weeksFromStart * 7));
 
@@ -490,7 +523,13 @@ function updateDateDisplay() {
 
 function calculateDifficulty() {
     const weeksFromStart = parseInt(elements.planningDateSlider.value);
-    const totalWeeks = 42;
+
+    // Calculate actual weeks from Jan 1, 2025 to today
+    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    const today = new Date();
+    const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    const totalWeeks = Math.floor(daysSinceStart / 7);
+
     const weeksAgo = totalWeeks - weeksFromStart;
 
     // Count checked items
@@ -570,7 +609,7 @@ function initializeGame() {
 
     // Reset player position
     gameState.game.player.x = 360;
-    gameState.game.player.y = 570;
+    gameState.game.player.y = 517;
 
     // Set difficulty-based speed and object count
     const difficulty = gameState.assessment.difficulty;
@@ -836,23 +875,16 @@ function gameLoop() {
         }
     });
 
-    // Draw player (catcher basket)
-    ctx.fillStyle = '#8B4513'; // Brown color
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-
-    // Add basket details
-    ctx.strokeStyle = '#654321';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(player.x, player.y, player.width, player.height);
-
-    // Draw basket grid pattern
-    ctx.strokeStyle = '#654321';
-    ctx.lineWidth = 1;
-    for (let i = 1; i < 4; i++) {
-        ctx.beginPath();
-        ctx.moveTo(player.x + (player.width / 4) * i, player.y);
-        ctx.lineTo(player.x + (player.width / 4) * i, player.y + player.height);
-        ctx.stroke();
+    // Draw player character
+    if (gameState.playerCharacter.loaded && gameState.playerCharacter.image.complete) {
+        ctx.drawImage(gameState.playerCharacter.image, player.x, player.y, player.width, player.height);
+    } else {
+        // Fallback to simple rectangle if character not loaded
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+        ctx.strokeStyle = '#654321';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(player.x, player.y, player.width, player.height);
     }
 
     // Render messages on top of everything
@@ -1342,4 +1374,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePlanningAssessment();
     preloadIcons(); // Load drop icons
     preloadBackground(); // Load background image
+    preloadPlayerCharacter(); // Load player character sprite
 });
