@@ -492,11 +492,10 @@ function updateCountdown() {
 // Planning Assessment Functions
 // ===================================
 function initializePlanningAssessment() {
-    // Calculate actual weeks from Jan 1 of current year to today
+    // Calculate actual days from Jan 1 of current year to today
     const today = new Date();
     const startDate = new Date(today.getFullYear(), 0, 1); // January 1 of current year
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-    const totalWeeks = Math.floor(daysSinceStart / 7);
 
     // Update the date slider labels to show current year
     const dateLabels = document.querySelector('.date-labels');
@@ -507,9 +506,9 @@ function initializePlanningAssessment() {
         }
     }
 
-    // Set slider max value to actual weeks since start
-    elements.planningDateSlider.max = totalWeeks;
-    elements.planningDateSlider.value = totalWeeks; // Default to today
+    // Set slider max value to actual days since start (more granular control)
+    elements.planningDateSlider.max = daysSinceStart;
+    elements.planningDateSlider.value = daysSinceStart; // Default to today
 
     // Initialize date slider
     updateDateDisplay();
@@ -528,41 +527,49 @@ function initializePlanningAssessment() {
 }
 
 function updateDateDisplay() {
-    const weeksFromStart = parseInt(elements.planningDateSlider.value);
+    const daysFromStart = parseInt(elements.planningDateSlider.value);
 
-    // Calculate actual weeks from Jan 1 of current year to today
+    // Calculate actual days from Jan 1 of current year to today
     const today = new Date();
     const startDate = new Date(today.getFullYear(), 0, 1); // January 1 of current year
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-    const totalWeeks = Math.floor(daysSinceStart / 7);
 
-    const weeksAgo = totalWeeks - weeksFromStart;
+    const daysAgo = daysSinceStart - daysFromStart;
+    const weeksAgo = Math.floor(daysAgo / 7);
 
-    // Calculate the selected date based on weeks from January 1 of current year
+    // Calculate the selected date based on days from January 1 of current year
     const selectedDate = new Date(startDate);
-    selectedDate.setDate(selectedDate.getDate() + (weeksFromStart * 7));
+    selectedDate.setDate(selectedDate.getDate() + daysFromStart);
 
     // Format the date
     const options = { month: 'long', day: 'numeric', year: 'numeric' };
     const dateString = selectedDate.toLocaleDateString('en-US', options);
 
     elements.selectedDate.textContent = dateString;
-    elements.weeksAgo.textContent = weeksAgo === 0 ? 'Today' : `${weeksAgo} week${weeksAgo !== 1 ? 's' : ''} ago`;
+
+    // Show "Today" if slider is at max position, otherwise show weeks ago
+    if (daysAgo === 0) {
+        elements.weeksAgo.textContent = 'Today';
+    } else if (weeksAgo === 0) {
+        elements.weeksAgo.textContent = `${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago`;
+    } else {
+        elements.weeksAgo.textContent = `${weeksAgo} week${weeksAgo !== 1 ? 's' : ''} ago`;
+    }
 
     // Recalculate difficulty
     calculateDifficulty();
 }
 
 function calculateDifficulty() {
-    const weeksFromStart = parseInt(elements.planningDateSlider.value);
+    const daysFromStart = parseInt(elements.planningDateSlider.value);
 
-    // Calculate actual weeks from Jan 1 of current year to today
+    // Calculate actual days from Jan 1 of current year to today
     const today = new Date();
     const startDate = new Date(today.getFullYear(), 0, 1); // January 1 of current year
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-    const totalWeeks = Math.floor(daysSinceStart / 7);
 
-    const weeksAgo = totalWeeks - weeksFromStart;
+    const daysAgo = daysSinceStart - daysFromStart;
+    const weeksAgo = Math.floor(daysAgo / 7);
 
     // Count checked items
     const checkboxes = document.querySelectorAll('input[name="prep-item"]:checked');
@@ -1320,11 +1327,10 @@ elements.readyButton.addEventListener('click', () => {
     const today = new Date();
     const startDate = new Date(today.getFullYear(), 0, 1);
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
-    const totalWeeks = Math.floor(daysSinceStart / 7);
 
-    // Update slider max and default value to current date
-    elements.planningDateSlider.max = totalWeeks;
-    elements.planningDateSlider.value = totalWeeks;
+    // Update slider max and default value to current date (in days for accuracy)
+    elements.planningDateSlider.max = daysSinceStart;
+    elements.planningDateSlider.value = daysSinceStart;
 
     // Update date display with current data
     updateDateDisplay();
