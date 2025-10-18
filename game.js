@@ -492,11 +492,20 @@ function updateCountdown() {
 // Planning Assessment Functions
 // ===================================
 function initializePlanningAssessment() {
-    // Calculate actual weeks from Jan 1, 2025 to today
-    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    // Calculate actual weeks from Jan 1 of current year to today
     const today = new Date();
+    const startDate = new Date(today.getFullYear(), 0, 1); // January 1 of current year
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
     const totalWeeks = Math.floor(daysSinceStart / 7);
+
+    // Update the date slider labels to show current year
+    const dateLabels = document.querySelector('.date-labels');
+    if (dateLabels) {
+        const firstLabel = dateLabels.querySelector('span:first-child');
+        if (firstLabel) {
+            firstLabel.textContent = `Jan ${today.getFullYear()}`;
+        }
+    }
 
     // Set slider max value to actual weeks since start
     elements.planningDateSlider.max = totalWeeks;
@@ -521,15 +530,15 @@ function initializePlanningAssessment() {
 function updateDateDisplay() {
     const weeksFromStart = parseInt(elements.planningDateSlider.value);
 
-    // Calculate actual weeks from Jan 1, 2025 to today
-    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    // Calculate actual weeks from Jan 1 of current year to today
     const today = new Date();
+    const startDate = new Date(today.getFullYear(), 0, 1); // January 1 of current year
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
     const totalWeeks = Math.floor(daysSinceStart / 7);
 
     const weeksAgo = totalWeeks - weeksFromStart;
 
-    // Calculate the selected date based on weeks from January 1, 2025
+    // Calculate the selected date based on weeks from January 1 of current year
     const selectedDate = new Date(startDate);
     selectedDate.setDate(selectedDate.getDate() + (weeksFromStart * 7));
 
@@ -547,9 +556,9 @@ function updateDateDisplay() {
 function calculateDifficulty() {
     const weeksFromStart = parseInt(elements.planningDateSlider.value);
 
-    // Calculate actual weeks from Jan 1, 2025 to today
-    const startDate = new Date(2025, 0, 1); // January 1, 2025
+    // Calculate actual weeks from Jan 1 of current year to today
     const today = new Date();
+    const startDate = new Date(today.getFullYear(), 0, 1); // January 1 of current year
     const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
     const totalWeeks = Math.floor(daysSinceStart / 7);
 
