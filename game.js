@@ -672,20 +672,20 @@ function initializeGame() {
     // Set difficulty-based speed and object count
     const difficulty = gameState.assessment.difficulty;
     if (difficulty === 'EASY') {
-        gameState.game.baseSpeed = 1;
-        gameState.game.spawnInterval = 120; // ~2 seconds between objects
+        gameState.game.baseSpeed = 1.5;
+        gameState.game.spawnInterval = 90; // ~1.5 seconds between objects
         gameState.game.objectsPerSpawn = 1;
     } else if (difficulty === 'MEDIUM') {
-        gameState.game.baseSpeed = 1.5;
-        gameState.game.spawnInterval = 100; // ~1.7 seconds
+        gameState.game.baseSpeed = 2;
+        gameState.game.spawnInterval = 75; // ~1.25 seconds
         gameState.game.objectsPerSpawn = 1;
     } else if (difficulty === 'HARD') {
-        gameState.game.baseSpeed = 2;
-        gameState.game.spawnInterval = 90; // ~1.5 seconds
+        gameState.game.baseSpeed = 2.5;
+        gameState.game.spawnInterval = 70; // ~1.2 seconds
         gameState.game.objectsPerSpawn = 2; // 2 objects at once
     } else if (difficulty === 'EXTREME') {
-        gameState.game.baseSpeed = 1.8;
-        gameState.game.spawnInterval = 95; // ~1.6 seconds
+        gameState.game.baseSpeed = 2.2;
+        gameState.game.spawnInterval = 80; // ~1.3 seconds
         gameState.game.objectsPerSpawn = 1; // Start with 1 object, but ramps up faster through progression
     }
 
