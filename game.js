@@ -669,25 +669,15 @@ function initializeGame() {
     gameState.game.player.x = (gameState.game.canvasWidth - gameState.game.player.width) / 2;
     gameState.game.player.y = gameState.game.canvasHeight - gameState.game.player.height;
 
-    // Set difficulty-based speed and object count
+    // Set unified baseline for all difficulties
+    // All difficulties start at the same comfortable "medium" level
+    gameState.game.baseSpeed = 1.8;
+    gameState.game.spawnInterval = 85;
+    gameState.game.objectsPerSpawn = 1;
+
+    // Store difficulty for progression calculations
     const difficulty = gameState.assessment.difficulty;
-    if (difficulty === 'EASY') {
-        gameState.game.baseSpeed = 1.5;
-        gameState.game.spawnInterval = 90; // ~1.5 seconds between objects
-        gameState.game.objectsPerSpawn = 1;
-    } else if (difficulty === 'MEDIUM') {
-        gameState.game.baseSpeed = 2;
-        gameState.game.spawnInterval = 75; // ~1.25 seconds
-        gameState.game.objectsPerSpawn = 1;
-    } else if (difficulty === 'HARD') {
-        gameState.game.baseSpeed = 2.5;
-        gameState.game.spawnInterval = 70; // ~1.2 seconds
-        gameState.game.objectsPerSpawn = 2; // 2 objects at once
-    } else if (difficulty === 'EXTREME') {
-        gameState.game.baseSpeed = 2.2;
-        gameState.game.spawnInterval = 80; // ~1.3 seconds
-        gameState.game.objectsPerSpawn = 1; // Start with 1 object, but ramps up faster through progression
-    }
+    gameState.game.difficulty = difficulty;
 
     // Clear messages on restart
     gameState.game.messages = [];
@@ -775,13 +765,47 @@ function checkLevelProgression() {
         // Send notification for new level
         sendNotification(gameState.game.level);
 
-        // Increase difficulty for next level (gentler progression)
-        gameState.game.baseSpeed += 0.2;
-        gameState.game.spawnInterval = Math.max(30, gameState.game.spawnInterval - 3);
+        // Apply difficulty-based progression rates
+        const difficulty = gameState.game.difficulty;
+        let speedIncrease = 0.25; // Default MEDIUM
+        let intervalDecrease = 3; // Default MEDIUM
 
-        // Increase objects per spawn at higher levels
-        if (gameState.game.level >= 5 && gameState.game.level % 2 === 0) {
-            gameState.game.objectsPerSpawn = Math.min(gameState.game.objectsPerSpawn + 1, 5);
+        if (difficulty === 'EASY') {
+            speedIncrease = 0.15;
+            intervalDecrease = 2;
+        } else if (difficulty === 'MEDIUM') {
+            speedIncrease = 0.25;
+            intervalDecrease = 3;
+        } else if (difficulty === 'HARD') {
+            speedIncrease = 0.35;
+            intervalDecrease = 4;
+        } else if (difficulty === 'EXTREME') {
+            speedIncrease = 0.45;
+            intervalDecrease = 5;
+        }
+
+        // Increase difficulty for next level
+        gameState.game.baseSpeed += speedIncrease;
+        gameState.game.spawnInterval = Math.max(30, gameState.game.spawnInterval - intervalDecrease);
+
+        // Difficulty-based object spawning
+        if (difficulty === 'EASY' || difficulty === 'MEDIUM') {
+            // EASY/MEDIUM: 1 object until level 7, then 2
+            if (gameState.game.level >= 7) {
+                gameState.game.objectsPerSpawn = 2;
+            }
+        } else if (difficulty === 'HARD') {
+            // HARD: 2 objects from level 5
+            if (gameState.game.level >= 5) {
+                gameState.game.objectsPerSpawn = 2;
+            }
+        } else if (difficulty === 'EXTREME') {
+            // EXTREME: 2 objects from level 4, 3 objects at level 8
+            if (gameState.game.level >= 8) {
+                gameState.game.objectsPerSpawn = 3;
+            } else if (gameState.game.level >= 4) {
+                gameState.game.objectsPerSpawn = 2;
+            }
         }
 
         // Check if player won (completed all 10 levels)
