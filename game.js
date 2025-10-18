@@ -1316,6 +1316,19 @@ function generateScoreCardImage() {
 // Event Listeners
 // ===================================
 elements.readyButton.addEventListener('click', () => {
+    // Recalculate slider range with current real-time date
+    const today = new Date();
+    const startDate = new Date(today.getFullYear(), 0, 1);
+    const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    const totalWeeks = Math.floor(daysSinceStart / 7);
+
+    // Update slider max and default value to current date
+    elements.planningDateSlider.max = totalWeeks;
+    elements.planningDateSlider.value = totalWeeks;
+
+    // Update date display with current data
+    updateDateDisplay();
+
     elements.countdownSection.classList.add('hidden');
     elements.assessmentSection.classList.remove('hidden');
     elements.assessmentSection.scrollIntoView({ behavior: 'smooth' });
