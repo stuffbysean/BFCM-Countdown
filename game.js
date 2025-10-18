@@ -670,9 +670,9 @@ function initializeGame() {
     gameState.game.player.y = gameState.game.canvasHeight - gameState.game.player.height;
 
     // Set unified baseline for all difficulties
-    // All difficulties start at a challenging level (equivalent to previous EXTREME level 3)
-    gameState.game.baseSpeed = 2.7;
-    gameState.game.spawnInterval = 75;
+    // All difficulties start at a challenging level
+    gameState.game.baseSpeed = 3.2;
+    gameState.game.spawnInterval = 65;
     gameState.game.objectsPerSpawn = 1;
 
     // Store difficulty for progression calculations
